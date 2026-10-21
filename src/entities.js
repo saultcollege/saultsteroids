@@ -32,17 +32,29 @@ export const PENCIL = Object.freeze({
     cooldown: 0.2,
 });
 
-/** No input at all; also what tests start from. */
-export const NO_CONTROLS = Object.freeze({ turn: 0, thrust: 0, brake: false, stick: null, fire: false });
+/**
+ * No input at all; also what tests start from. Controls can steer three ways:
+ * `turn` (keyboard, -1..1), `stick` (an analog stick {x, y}) or `aim` (an
+ * angle to face, from a phone controller).
+ */
+export const NO_CONTROLS = Object.freeze({ turn: 0, thrust: 0, brake: false, stick: null, aim: null, fire: false });
 
 /** Unit vector pointing along a LittleJS angle (0 up, clockwise). */
 const direction = (angle) => vec2().setAngle(angle, 1);
 
 export class PaperPlane extends EngineObject
 {
-    constructor(pos)
+    /**
+     * @param {Vector2} pos
+     * @param {Color} [color] keel and wing colour, to tell players apart
+     * @param {string} [label] name shown under the plane on the big screen
+     */
+    constructor(pos, color = COLORS.green, label = '')
     {
         super(pos, vec2(1.4));
+        this.color = color;
+        this.wingColor = color.lerp(COLORS.paper, 0.55);
+        this.label = label;
         this.damping = PLANE.damping;
         this.controls = NO_CONTROLS;
         this.invulnerable = new Timer(PLANE.invulnerableTime);
@@ -67,6 +79,8 @@ export class PaperPlane extends EngineObject
                 this.angle = turnToward(this.angle, steer.aim, PLANE.aimTurnSpeed);
             thrust = Math.max(thrust, steer.thrust);
         }
+        if (c.aim !== null && c.aim !== undefined)
+            this.angle = turnToward(this.angle, c.aim, PLANE.aimTurnSpeed);
 
         this.thrusting = thrust;
         if (thrust > 0)
@@ -104,17 +118,22 @@ export class PaperPlane extends EngineObject
             }
 
         drawPoly([nose, leftTip, tail], COLORS.paper, 0.05, COLORS.slate, this.pos, this.angle);
-        drawPoly([nose, tail, rightTip], COLORS.paperShade, 0.05, COLORS.slate, this.pos, this.angle);
-        // brand green fold down the keel
-        drawLine(nose, tail, 0.1, COLORS.green, this.pos, this.angle);
+        drawPoly([nose, tail, rightTip], this.wingColor, 0.05, COLORS.slate, this.pos, this.angle);
+        // coloured fold down the keel: brand green for a solo player
+        drawLine(nose, tail, 0.1, this.color, this.pos, this.angle);
+
+        if (this.label)
+            drawText(this.label, this.pos.add(vec2(0, -1.2)), 0.55, this.color, 0.08, COLORS.night, 'center', FONT, 'bold');
     }
 }
 
 export class Pencil extends EngineObject
 {
-    constructor(pos, angle, inheritedVelocity = vec2())
+    /** @param {object} [owner] the player who threw it, credited for what it hits */
+    constructor(pos, angle, inheritedVelocity = vec2(), owner = null)
     {
         super(pos, vec2(0.16, 0.7), undefined, angle);
+        this.owner = owner;
         this.velocity = direction(angle).scale(PENCIL.speed).add(inheritedVelocity);
         this.life = new Timer(PENCIL.lifeTime);
         this.renderOrder = 5;

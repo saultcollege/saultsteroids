@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Collect the static site
-        run: mkdir _site && cp -r index.html src lib assets nettest _site/
+        run: mkdir _site && cp -r index.html src lib assets play _site/
       - uses: actions/upload-pages-artifact@v3
       - id: deployment
         uses: actions/deploy-pages@v4

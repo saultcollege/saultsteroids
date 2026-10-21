@@ -38,6 +38,21 @@
         </section>
     </main>
 
+    <aside id="kiosk-panel" hidden>
+        <div class="join">
+            <div id="kiosk-qr" aria-hidden="true"></div>
+            <div class="join-text">
+                <p class="scan">Scan to play!</p>
+                <p class="room">Room <strong id="kiosk-code"></strong></p>
+                <p class="url" id="kiosk-url"></p>
+            </div>
+        </div>
+        <ol id="scoreboard"></ol>
+        <p id="scoreboard-empty">Everyone flies their own paper airplane. Clear the sky together!</p>
+        <p id="kiosk-status" role="status"></p>
+        <img class="logo" src="assets/sault-college-logo-reverse.png" alt="Sault College" width="160" height="64">
+    </aside>
+
     <noscript>Saultsteroids needs JavaScript to run.</noscript>
     <script type="module" src="src/main.js"></script>
 </body>

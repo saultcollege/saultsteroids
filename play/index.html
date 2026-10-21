@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f1c24">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Saultsteroids Controller</title>
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Domine:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/play.css">
+</head>
+<body>
+    <header>
+        <span id="swatch" class="swatch"></span>
+        <span id="name" class="name">Saultsteroids</span>
+        <span id="coffees" class="coffees"></span>
+        <span id="credits" class="credits"></span>
+    </header>
+
+    <main id="pad">
+        <div id="stick-zone" class="zone" aria-label="Steer: drag to point and fly">
+            <div id="stick-base" class="stick-base"><div id="stick-knob" class="stick-knob"></div></div>
+            <p class="hint">Drag to steer &amp; fly</p>
+        </div>
+        <div id="fire-zone" class="zone">
+            <button id="fire" type="button" class="fire" aria-label="Throw pencils">✏️<span>Throw</span></button>
+        </div>
+    </main>
+
+    <div id="overlay" class="overlay">
+        <div class="card">
+            <h1 id="overlay-title">Saultsteroids</h1>
+            <p id="overlay-text">Joining the game…</p>
+            <form id="room-form" hidden>
+                <label for="room-input">Room code from the big screen</label>
+                <input id="room-input" autocomplete="off" autocapitalize="characters" maxlength="6" inputmode="text">
+                <button type="submit">Join</button>
+            </form>
+            <button id="overlay-button" type="button" hidden></button>
+        </div>
+    </div>
+
+    <script type="module" src="../src/controller-ui.js"></script>
+</body>
+</html>

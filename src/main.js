@@ -1,5 +1,6 @@
 /**
- * Browser entry point: engine settings, touch controls and the HTML menus.
+ * Browser entry point for the big screen: engine settings, touch controls,
+ * the HTML menus, and kiosk mode (`?kiosk`).
  */
 import {
     engineInit, isTouchDevice, keyWasPressed, gamepadWasPressed,
@@ -10,6 +11,10 @@ import {
 } from '../lib/littlejs.esm.min.js';
 import * as game from './game.js';
 import { COLORS, FONT } from './theme.js';
+import { startKiosk } from './kiosk-ui.js';
+import { createTransportFromUrl } from './net/transports.js';
+
+const kioskMode = new URLSearchParams(location.search).has('kiosk');
 
 // Plain Canvas2D keeps labels drawn in order with the shapes; there are
 // only a few dozen objects, which phones handle easily.
@@ -18,7 +23,7 @@ setCanvasPixelRatio(undefined); // track devicePixelRatio for sharp text on phon
 setCanvasClearColor(COLORS.night);
 setFontDefault(FONT);
 
-if (isTouchDevice)
+if (isTouchDevice && !kioskMode)
 {
     setTouchGamepadEnable(true);
     setTouchGamepadAnalog(true);   // left thumb: steer and thrust
@@ -41,7 +46,7 @@ function showMenu(mode)
 
     if (mode === 'gameover')
     {
-        document.getElementById('final-credits').textContent = game.state.credits;
+        document.getElementById('final-credits').textContent = game.localPlayer()?.credits ?? 0;
         document.getElementById('final-semester').textContent = game.state.semester;
         document.getElementById('best-credits').textContent = game.state.best;
     }
@@ -54,13 +59,27 @@ for (const button of document.querySelectorAll('[data-action="start"]'))
 game.onModeChange(showMenu);
 document.body.classList.toggle('touch', isTouchDevice);
 
+let kiosk = null;
+
+function gameInit()
+{
+    game.gameInit();
+    if (kioskMode)
+        kiosk = startKiosk(createTransportFromUrl);
+}
+
 function gameUpdate()
 {
-    // keyboard and gamepad can start a run from either menu
-    const menuOpen = game.state.mode !== 'playing';
-    if (menuOpen && (keyWasPressed('Enter') || gamepadWasPressed(9) || gamepadWasPressed(0) && !isTouchDevice))
-        game.startGame();
+    if (kiosk)
+        kiosk.update();
+    else
+    {
+        // keyboard and gamepad can start a run from either menu
+        const menuOpen = game.state.mode !== 'playing';
+        if (menuOpen && (keyWasPressed('Enter') || gamepadWasPressed(9) || gamepadWasPressed(0) && !isTouchDevice))
+            game.startGame();
+    }
     game.gameUpdate();
 }
 
-engineInit(game.gameInit, gameUpdate, game.gameUpdatePost, game.gameRender, game.gameRenderPost);
+engineInit(gameInit, gameUpdate, game.gameUpdatePost, game.gameRender, game.gameRenderPost);

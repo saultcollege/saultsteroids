@@ -15,6 +15,8 @@ import { TIERS, STARTING_COFFEES, semesterSetup } from '../src/rules.js';
 import { playfieldHalf } from '../src/playfield.js';
 
 const { state } = game;
+const me = () => game.localPlayer();
+const plane = () => me().plane;
 const seconds = (s) => Math.ceil(s * 60);
 let controls = NO_CONTROLS;
 let modes = [];
@@ -58,18 +60,19 @@ describe('title screen', () => {
     test('starts on the title with deadlines drifting behind it', () => {
         assert.equal(state.mode, 'title');
         assert.ok(state.deadlines.length > 0);
-        assert.equal(state.player, null);
+        assert.equal(state.players.size, 0);
     });
 });
 
 describe('starting a run', () => {
     test('resets credits, coffees and semester', () => {
-        state.credits = 999;
+        game.startGame();
+        me().credits = 999;
         game.startGame();
         assert.equal(state.mode, 'playing');
-        assert.deepEqual(modes, ['playing']);
-        assert.equal(state.credits, 0);
-        assert.equal(state.coffees, STARTING_COFFEES);
+        assert.deepEqual(modes, ['playing', 'playing']);
+        assert.equal(me().credits, 0);
+        assert.equal(me().coffees, STARTING_COFFEES);
         assert.equal(state.semester, 1);
         assert.equal(state.deadlines.length, semesterSetup(1).examCount);
         assert.ok(state.deadlines.every((d) => d.tier === TIERS.EXAM));
@@ -80,13 +83,13 @@ describe('starting a run', () => {
         {
             game.startGame();
             for (const d of state.deadlines)
-                assert.ok(d.pos.distance(state.player.pos) >= game.SAFE_SPAWN_DISTANCE);
+                assert.ok(d.pos.distance(plane().pos) >= game.SAFE_SPAWN_DISTANCE);
         }
     });
 
     test('the plane starts briefly invulnerable', () => {
         game.startGame();
-        assert.equal(state.player.isInvulnerable(), true);
+        assert.equal(plane().isInvulnerable(), true);
     });
 });
 
@@ -100,35 +103,35 @@ describe('flying the paper airplane', () => {
     test('thrust flies the plane the way it faces (up)', () => {
         controls = { ...NO_CONTROLS, thrust: 1 };
         engineStep(30);
-        assert.ok(state.player.pos.y > 0.5, `y=${state.player.pos.y}`);
-        assert.ok(Math.abs(state.player.pos.x) < 1e-6);
+        assert.ok(plane().pos.y > 0.5, `y=${plane().pos.y}`);
+        assert.ok(Math.abs(plane().pos.x) < 1e-6);
     });
 
     test('speed is capped', () => {
         controls = { ...NO_CONTROLS, thrust: 1 };
         engineStep(seconds(5));
-        assert.ok(state.player.velocity.length() <= PLANE.maxSpeed + 1e-9);
+        assert.ok(plane().velocity.length() <= PLANE.maxSpeed + 1e-9);
     });
 
     test('turning right rotates clockwise', () => {
         controls = { ...NO_CONTROLS, turn: 1 };
         engineStep(10);
-        assert.ok(state.player.angle > 0);
+        assert.ok(plane().angle > 0);
     });
 
     test('a touch stick turns the plane to face it and thrusts', () => {
         controls = { ...NO_CONTROLS, stick: vec2(1, 0) };
         engineStep(30);
-        assert.ok(Math.abs(state.player.angle - Math.PI / 2) < 1e-6, `angle=${state.player.angle}`);
-        assert.ok(state.player.pos.x > 0);
+        assert.ok(Math.abs(plane().angle - Math.PI / 2) < 1e-6, `angle=${plane().angle}`);
+        assert.ok(plane().pos.x > 0);
     });
 
     test('flying off one edge comes back on the other', () => {
         const half = playfieldHalf();
-        state.player.pos = vec2(half.x + PLANE.radius - 0.05, 0);
-        state.player.velocity = vec2(0.2, 0);
+        plane().pos = vec2(half.x + PLANE.radius - 0.05, 0);
+        plane().velocity = vec2(0.2, 0);
         engineStep(2);
-        assert.ok(state.player.pos.x < 0, `x=${state.player.pos.x}`);
+        assert.ok(plane().pos.x < 0, `x=${plane().pos.x}`);
     });
 
     test('pencils are thrown at a limited rate and expire', () => {
@@ -146,7 +149,7 @@ describe('flying the paper airplane', () => {
 describe('clearing deadlines', () => {
     beforeEach(() => {
         game.startGame();
-        state.player.invulnerable.unset();
+        plane().invulnerable.unset();
         emptySky();
     });
 
@@ -158,9 +161,15 @@ describe('clearing deadlines', () => {
         controls = NO_CONTROLS;
         engineStep(20);
         assert.equal(exam.destroyed, true);
-        assert.equal(state.credits, 20);
+        assert.equal(me().credits, 20);
         assert.equal(state.deadlines.filter((d) => d.tier === TIERS.ASSIGNMENT).length, 2);
         assert.equal(state.pencils.length, 0, 'the pencil is used up');
+    });
+
+    test('credit goes to whoever threw the pencil, not just anyone', () => {
+        const quiz = addDeadline(vec2(5, 5), TIERS.QUIZ);
+        game.hitDeadline(quiz);
+        assert.equal(me().credits, 0);
     });
 
     test('split pieces fly apart', () => {
@@ -172,9 +181,9 @@ describe('clearing deadlines', () => {
 
     test('a quiz is cleared completely for 100 credits', () => {
         const quiz = addDeadline(vec2(5, 5), TIERS.QUIZ);
-        const pieces = game.hitDeadline(quiz);
+        const pieces = game.hitDeadline(quiz, me());
         assert.deepEqual(pieces, []);
-        assert.equal(state.credits, 100);
+        assert.equal(me().credits, 100);
         assert.equal(state.deadlines.length, 0);
     });
 
@@ -197,32 +206,33 @@ describe('spilling coffee', () => {
     beforeEach(() => {
         game.startGame();
         emptySky();
-        state.player.invulnerable.unset();
+        plane().invulnerable.unset();
     });
 
     test('hitting a deadline spills a coffee and respawns the plane', () => {
-        state.player.pos = vec2(4, 4);
+        plane().pos = vec2(4, 4);
         addDeadline(vec2(4, 4), TIERS.QUIZ);
         engineStep(1);
-        assert.equal(state.coffees, STARTING_COFFEES - 1);
-        assert.ok(state.player.pos.length() < 0.1, 'back at the centre');
-        assert.equal(state.player.isInvulnerable(), true);
+        assert.equal(me().coffees, STARTING_COFFEES - 1);
+        assert.ok(plane().pos.distance(vec2(4, 4)) > 4, 'respawned clear of the quiz');
+        assert.equal(plane().isInvulnerable(), true);
     });
 
     test('no second spill while invulnerable', () => {
         addDeadline(vec2(0, 0), TIERS.EXAM);
         engineStep(seconds(1));
-        assert.equal(state.coffees, STARTING_COFFEES - 1);
+        assert.equal(me().coffees, STARTING_COFFEES - 1);
     });
 
     test('running out of coffee ends the run and records the best', () => {
         state.best = 0;
-        state.credits = 1234;
-        state.coffees = 1;
+        me().credits = 1234;
+        me().coffees = 1;
         addDeadline(vec2(0, 0), TIERS.EXAM);
         engineStep(1);
         assert.equal(state.mode, 'gameover');
-        assert.equal(state.player, null);
+        assert.equal(plane(), null);
+        assert.equal(me().out, true);
         assert.equal(state.best, 1234);
         assert.ok(modes.includes('gameover'));
     });
@@ -231,10 +241,10 @@ describe('spilling coffee', () => {
 describe('pausing', () => {
     test('nothing moves while paused', () => {
         game.startGame();
-        state.player.velocity = vec2(0.2, 0);
-        const before = state.player.pos.copy();
+        plane().velocity = vec2(0.2, 0);
+        const before = plane().pos.copy();
         setPaused(true);
         engineStep(30);
-        assert.ok(state.player.pos.distance(before) < 1e-9);
+        assert.ok(plane().pos.distance(before) < 1e-9);
     });
 });
