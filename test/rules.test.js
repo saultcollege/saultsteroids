@@ -2,7 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
     TIERS, TIER_RADIUS, TIER_CREDITS, wrapCoordinate, childTier, creditsFor,
-    semesterSetup, semesterLabel, earnsDiploma, angleDelta, turnToward,
+    semesterSetup, semesterLabel, earnsDiploma, angleDelta, turnToward, readableAngle,
     circlesOverlap, stickSteering, splitAngles,
 } from '../src/rules.js';
 
@@ -99,6 +99,13 @@ describe('steering', () => {
     test('angleDelta takes the short way round', () => {
         close(angleDelta(0, Math.PI / 2), Math.PI / 2);
         close(angleDelta(0.1, Math.PI * 2 - 0.1), -0.2);
+    });
+
+    test('readableAngle keeps labels within a quarter turn of upright', () => {
+        close(readableAngle(0.5), 0.5);
+        close(readableAngle(Math.PI - 0.2), -0.2);
+        close(readableAngle(-Math.PI + 0.3), 0.3);
+        close(readableAngle(Math.PI * 4 + 0.1), 0.1);
     });
 
     test('turnToward limits the turn rate', () => {

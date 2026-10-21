@@ -92,6 +92,13 @@ export function angleDelta(from, to)
     return d;
 }
 
+/** Turn text by an object's angle, flipped half a turn so it is never upside down. */
+export function readableAngle(angle)
+{
+    const upright = angleDelta(0, angle);
+    return Math.abs(upright) > Math.PI / 2 ? upright - Math.sign(upright) * Math.PI : upright;
+}
+
 /** Rotate `current` toward `target`, turning at most `maxStep` radians. */
 export function turnToward(current, target, maxStep)
 {

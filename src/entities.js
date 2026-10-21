@@ -9,7 +9,7 @@ import {
     EngineObject, Timer, vec2, rand, randInt,
     drawPoly, drawLine, drawRect, drawText,
 } from '../lib/littlejs.esm.min.js';
-import { TIER_RADIUS, stickSteering, turnToward } from './rules.js';
+import { TIER_RADIUS, readableAngle, stickSteering, turnToward } from './rules.js';
 import { COLORS, FONT, TEXTBOOK_COVERS, TIER_LABELS } from './theme.js';
 import { wrapObject } from './playfield.js';
 
@@ -212,6 +212,6 @@ export class Deadline extends EngineObject
 
     drawLabel(color, size, maxWidth)
     {
-        drawText(this.label, this.pos, size, color, 0, undefined, 'center', FONT, 'bold', maxWidth, this.angle);
+        drawText(this.label, this.pos, size, color, 0, undefined, 'center', FONT, 'bold', maxWidth, readableAngle(this.angle));
     }
 }
