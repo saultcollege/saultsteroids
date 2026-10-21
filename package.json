@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "npx --yes http-server -c-1 -p 8080 .",
-    "test": "node --test test/",
+    "test": "node --test \"test/*.test.js\"",
     "vendor": "node -e \"const fs=require('fs');fs.copyFileSync('node_modules/littlejsengine/dist/littlejs.esm.min.js','lib/littlejs.esm.min.js');fs.copyFileSync('node_modules/littlejsengine/LICENSE','lib/LICENSE-littlejs.txt')\""
   },
   "devDependencies": {
