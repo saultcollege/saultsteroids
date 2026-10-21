@@ -1,0 +1,16 @@
+{
+  "name": "saultsteroids",
+  "version": "0.1.0",
+  "description": "A Sault College themed Asteroids game built with LittleJS",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx --yes http-server -c-1 -p 8080 .",
+    "test": "node --test test/",
+    "vendor": "node -e \"const fs=require('fs');fs.copyFileSync('node_modules/littlejsengine/dist/littlejs.esm.min.js','lib/littlejs.esm.min.js');fs.copyFileSync('node_modules/littlejsengine/LICENSE','lib/LICENSE-littlejs.txt')\""
+  },
+  "devDependencies": {
+    "littlejsengine": "1.28.0"
+  }
+}

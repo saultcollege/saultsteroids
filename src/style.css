@@ -1,0 +1,109 @@
+:root {
+    --green: #8ea366;
+    --blue: #57b0e3;
+    --charcoal: #58585a;
+    --slate: #4a7085;
+    --night: #0f1c24;
+    --text: #ffffff;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--night);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
+}
+
+main {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+             max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 100; /* above the LittleJS touch gamepad overlay */
+}
+
+.menu {
+    pointer-events: auto;
+    width: min(440px, 100%);
+    max-height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 28px 24px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--slate) 92%, transparent);
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.45);
+    text-align: center;
+    touch-action: manipulation;
+}
+
+.menu[hidden] { display: none; }
+
+/* clear space around the logo, per the Sault College logo guidelines */
+.logo {
+    display: block;
+    width: 202px;
+    max-width: 70%;
+    height: auto;
+    margin: 4px auto 20px;
+}
+
+h1, h2 {
+    font-family: Domine, Georgia, serif;
+    margin: 0 0 10px;
+    letter-spacing: 0.02em;
+}
+
+h1 { font-size: clamp(1.9rem, 8vw, 2.6rem); }
+h2 { font-size: 1.8rem; }
+
+.tagline { margin: 0 0 14px; line-height: 1.4; }
+
+.how-to {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.how-to li { margin: 6px 0; }
+.how-to strong { color: #d8ecbf; }
+
+.controls {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin: 0 0 18px;
+}
+
+.touch .keyboard-only, body:not(.touch) .touch-only { display: none; }
+
+.result { font-size: 1.15rem; margin: 0 0 6px; }
+.best { margin: 0 0 20px; opacity: 0.85; }
+
+button {
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--night);
+    background: var(--green);
+    border: 0;
+    border-radius: 999px;
+    padding: 14px 34px;
+    cursor: pointer;
+    min-height: 48px;
+}
+
+button:hover { background: #a3b77d; }
+button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }

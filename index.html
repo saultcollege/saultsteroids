@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f1c24">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Saultsteroids: a Sault College take on Asteroids. Fly a paper airplane through a sky full of deadlines.">
+    <title>Saultsteroids</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Domine:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+    <main>
+        <section id="title-menu" class="menu" aria-labelledby="game-title">
+            <img class="logo" src="assets/sault-college-logo-reverse.png" alt="Sault College" width="202" height="81">
+            <h1 id="game-title">Saultsteroids</h1>
+            <p class="tagline">Deadlines are incoming. Fold your notes into a paper airplane and clear the sky.</p>
+            <ul class="how-to">
+                <li><strong>Pencils</strong> break exams into assignments, and assignments into quizzes.</li>
+                <li><strong>Credits</strong> for everything you clear. Clear the sky to finish the term.</li>
+                <li><strong>Coffee</strong> is your lives. Don't spill it.</li>
+            </ul>
+            <p class="controls keyboard-only">← → turn · ↑ fly · ↓ brake · Space throw · P pause</p>
+            <p class="controls touch-only">Left thumb: steer &amp; fly · Right thumb: throw</p>
+            <button type="button" data-action="start">Start semester</button>
+        </section>
+
+        <section id="gameover-menu" class="menu" aria-labelledby="gameover-title" hidden>
+            <h2 id="gameover-title">Out of coffee!</h2>
+            <p class="result"><span id="final-credits">0</span> credits by semester <span id="final-semester">1</span></p>
+            <p class="best">Best: <span id="best-credits">0</span> credits</p>
+            <button type="button" data-action="start">Try again</button>
+        </section>
+    </main>
+
+    <noscript>Saultsteroids needs JavaScript to run.</noscript>
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
